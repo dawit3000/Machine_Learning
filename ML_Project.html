@@ -9,9 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Dawit Aberra" />
 
 
-<title>ML_Project.knit</title>
+<title>A Predictive Model to describe the manner in which certain weight lifting exercises are completed.</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -361,31 +362,30 @@ pre code {
 
 
 
+<h1 class="title toc-ignore">A Predictive Model to describe the manner
+in which certain weight lifting exercises are completed.</h1>
+<h4 class="author">Dawit Aberra</h4>
+<h4 class="date">August 2022</h4>
 
 </div>
 
 
-<p>--- title: “ML Project” author: “Dawit Aberra” date: August 2022
-output: html_document: keep_md: true ---</p>
-<div id="a-predictive-model-to-describe-the-manner-in-which-certain-weight-lifting-exercises-are-completed." class="section level1">
-<h1>A Predictive Model to describe the manner in which certain weight
-lifting exercises are completed.</h1>
-</div>
 <div id="synopsis" class="section level1">
 <h1>Synopsis</h1>
 <p>We will use a <a href="http://groupware.les.inf.puc-rio.br/har">Weight Lifting Exercise
-Dataset</a> in which a training and testing datasets of accelerometers
-on the belt, forearm, arm, and dumbell of 6 participants were provided.
-These participants were asked to perform barbell lifts correctly and
-incorrectly in 5 different ways.</p>
+Dataset</a> in which <code>training</code> and <code>testing</code>
+datasets of accelerometers on the belt, forearm, arm, and dumbell of 6
+participants were provided. These participants were asked to perform
+barbell lifts correctly and incorrectly in 5 different ways.</p>
 <p>Our goal is to build a model that predicts the manner in which the
 participants did the exercise, with acceptable accuracy and minimal out
-of sample error. This is the “classe” variable in the training set which
-consists of six levels describing the manners. We use most of the other
-variables to predict with. This report describes how we built the model,
-how we used cross validation, what we think the expected out of sample
-error is, and why we made the choices we did. We will also use our
-prediction model to predict 20 different test cases.</p>
+of sample error. This is the <code>classe</code> variable in the
+training set which consists of six levels describing the manners. We use
+most of the other variables to predict with. This report describes how
+we built the model, how we used cross validation, what we think the
+expected out of sample error is, and why we made the choices we did. We
+will also use our prediction model to predict 20 different test
+cases.</p>
 </div>
 <div id="getting-and-cleaning-data" class="section level1">
 <h1>Getting and Cleaning Data</h1>
@@ -402,34 +402,39 @@ if (!file.exists(&quot;./data/pml-testing.csv&quot;))
   {download.file(testing_link, destfile=&quot;./data/pml-testing.csv&quot;, method=&quot;curl&quot;)}
 training &lt;-read.csv(&quot;./data/pml-training.csv&quot;)
 testing &lt;- read.csv(&quot;./data/pml-testing.csv&quot;)</code></pre>
-<p>The <code>training</code> dataset contains 19622 rows and 160
-columns. The <code>testing</code> dataset contains 20 rows and 160
-columns.</p>
+<p>The <code>training</code> data contains 19622 rows and 160 columns.
+The <code>testing</code> data contains 20 rows and 160 columns.</p>
 <pre class="r"><code>dim(training)</code></pre>
 <pre><code>## [1] 19622   160</code></pre>
 <pre class="r"><code>dim(testing)</code></pre>
 <pre><code>## [1]  20 160</code></pre>
 <p>Remove columns with missing values or mostly not available (NA)</p>
-<pre class="r"><code>mostlyNA &lt;- sapply(training, function(x) mean(is.na(x))) &gt; 0.95
-training &lt;- training[, mostlyNA==F]
-testing &lt;- testing[, mostlyNA==F]</code></pre>
-<p>Remove columns irrelevant to the outcome Inspecting the variables
-verses the outcome suggests that the firest 7 variables are fairly
-irrelevant to the expected outcome. We decided to remove these
-variables.</p>
+<pre class="r"><code>cs &lt;- colSums(is.na(training))
+training &lt;- training[ ,cs&lt;0.05*ncol(training)]
+testing &lt;- testing[ , cs&lt;0.05*ncol(training)]</code></pre>
+<p>Remove columns irrelevant to the outcome.</p>
+<pre class="r"><code>head(names(training), n=10)</code></pre>
+<pre><code>##  [1] &quot;X&quot;                    &quot;user_name&quot;            &quot;raw_timestamp_part_1&quot;
+##  [4] &quot;raw_timestamp_part_2&quot; &quot;cvtd_timestamp&quot;       &quot;new_window&quot;          
+##  [7] &quot;num_window&quot;           &quot;roll_belt&quot;            &quot;pitch_belt&quot;          
+## [10] &quot;yaw_belt&quot;</code></pre>
+<p>Inspecting the column names and importance, we find that the names
+that contain “X”, “user_name” and “<em>timestamp</em>” are pretty much
+irrelevant to the manner in which the exercises are performed. We
+suggest that the first 5 variables be removed.</p>
 <pre class="r"><code>training &lt;- training[,-c(1:5)] 
 testing &lt;- testing[,-c(1:5)] </code></pre>
-<p>Remove variables with zero and near-zero variance. Datasets come
+<p>Remove variables with zero and near-zero variance. Data come
 sometimes with predictors that take a unique value across sample. Such
-uninformative predictor is more common. This kind of predictor is not
-only non-informative, it can break some models [1]. We decided to remove
+predictor is more common. This kind of predictor is not only
+non-informative, it can break some models [1]. We decided to remove
 variables with near zero variance.</p>
 <pre class="r"><code>nzv &lt;- nearZeroVar(training)
 training &lt;- training[,-nzv]
 testing &lt;- testing[,-nzv]</code></pre>
-<p>The cleaned <code>training</code> dataset contains 19622 rows and 54
-columns. The cleaned <code>testing</code> dataset contains 20 rows and
-54 columns.</p>
+<p>The cleaned <code>training</code> data contains 19622 rows and 54
+columns. The cleaned <code>testing</code> data contains 20 rows and 54
+columns.</p>
 <pre class="r"><code>dim(training)</code></pre>
 <pre><code>## [1] 19622    54</code></pre>
 <pre class="r"><code>dim(testing)</code></pre>
@@ -439,23 +444,29 @@ columns. The cleaned <code>testing</code> dataset contains 20 rows and
 <h1>Generate <code>training</code> and <code>validation</code>
 Data.</h1>
 <p>At this stage, we leave the cleaned <code>testing</code> data aside
-for later use only, but we split the cleaned <code>training</code>
-dataset to <code>training</code> and <code>validation</code> datasets to
-be used in the next few steps. We will keep 70% of the training dataset
-for training our our model and the rest for validation.</p>
-<pre class="r"><code>inTrain &lt;- createDataPartition(y=training$classe, p=0.7, list=F)
+for later use only, but we split the cleaned <code>training</code> data
+to <code>training</code> and <code>validation</code> dataset to be used
+in the next few steps. We will keep 70% of the training data for
+training our model(s) and the rest for validation.</p>
+<pre class="r"><code>set.seed(1000)
+inTrain &lt;- createDataPartition(y=training$classe, p=0.70, list=F)
 training &lt;- training[inTrain, ]
 validation &lt;- training[-inTrain, ]</code></pre>
+<pre class="r"><code>dim(training)</code></pre>
+<pre><code>## [1] 13737    54</code></pre>
+<pre class="r"><code>dim(validation)</code></pre>
+<pre><code>## [1] 4104   54</code></pre>
 </div>
 <div id="cross-validation" class="section level1">
 <h1>Cross-Validation</h1>
-<p>Here we create a control to train the model using 3-Folds Cross
+<p>Here we create a control to train the model using 5-Folds Cross
 Validation.</p>
-<pre class="r"><code>tc &lt;- trainControl(method=&quot;cv&quot;, number=3, verboseIter=F)</code></pre>
+<pre class="r"><code>tc &lt;- trainControl(method=&quot;cv&quot;, number=5, verboseIter=F)</code></pre>
 </div>
-<div id="build-a-randomforest-model-and-view-the-final-parameters-it-chose" class="section level1">
-<h1>Build a RandomForest Model and view the final parameters it
-chose</h1>
+<div id="building-and-selection-of-model" class="section level1">
+<h1>Building and Selection of model</h1>
+<p>Here we build/train a model and view the properties: a
+<code>RandomForest</code> model</p>
 <pre class="r"><code>model_rf&lt;-train(classe ~ ., data=training, method=&quot;rf&quot;, trControl=tc)
 print(model_rf$finalModel)</code></pre>
 <pre><code>## 
@@ -468,11 +479,11 @@ print(model_rf$finalModel)</code></pre>
 ##         OOB estimate of  error rate: 0.2%
 ## Confusion matrix:
 ##      A    B    C    D    E  class.error
-## A 3905    0    0    0    1 0.0002560164
-## B    4 2652    2    0    0 0.0022573363
-## C    0    3 2392    1    0 0.0016694491
-## D    0    0   11 2240    1 0.0053285968
-## E    0    0    0    5 2520 0.0019801980</code></pre>
+## A 3904    1    0    0    1 0.0005120328
+## B    5 2651    1    1    0 0.0026335591
+## C    0    3 2393    0    0 0.0012520868
+## D    0    0    9 2243    0 0.0039964476
+## E    0    1    0    5 2519 0.0023762376</code></pre>
 </div>
 <div id="use-model_rf-to-predict-classe-on-the-validation-data-and-examine-accuracy-and-out-of-sample-errors-with-confusionmatrix" class="section level1">
 <h1>Use <code>model_rf</code> to predict <code>classe</code> on the
@@ -484,17 +495,17 @@ confusionMatrix(factor(validation$classe), predictions_on_validation)</code></pr
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1176    0    0    0    0
-##          B    0  778    0    0    0
-##          C    0    0  716    0    0
-##          D    0    0    0  725    0
-##          E    0    0    0    0  710
+##          A 1200    0    0    0    0
+##          B    0  767    0    0    0
+##          C    0    0  724    0    0
+##          D    0    0    0  686    0
+##          E    0    0    0    0  727
 ## 
 ## Overall Statistics
 ##                                      
 ##                Accuracy : 1          
 ##                  95% CI : (0.9991, 1)
-##     No Information Rate : 0.2865     
+##     No Information Rate : 0.2924     
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
 ##                                      
 ##                   Kappa : 1          
@@ -504,18 +515,30 @@ confusionMatrix(factor(validation$classe), predictions_on_validation)</code></pr
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   1.0000   1.0000   1.0000    1.000
-## Specificity            1.0000   1.0000   1.0000   1.0000    1.000
-## Pos Pred Value         1.0000   1.0000   1.0000   1.0000    1.000
-## Neg Pred Value         1.0000   1.0000   1.0000   1.0000    1.000
-## Prevalence             0.2865   0.1895   0.1744   0.1766    0.173
-## Detection Rate         0.2865   0.1895   0.1744   0.1766    0.173
-## Detection Prevalence   0.2865   0.1895   0.1744   0.1766    0.173
-## Balanced Accuracy      1.0000   1.0000   1.0000   1.0000    1.000</code></pre>
+## Sensitivity            1.0000   1.0000   1.0000   1.0000   1.0000
+## Specificity            1.0000   1.0000   1.0000   1.0000   1.0000
+## Pos Pred Value         1.0000   1.0000   1.0000   1.0000   1.0000
+## Neg Pred Value         1.0000   1.0000   1.0000   1.0000   1.0000
+## Prevalence             0.2924   0.1869   0.1764   0.1672   0.1771
+## Detection Rate         0.2924   0.1869   0.1764   0.1672   0.1771
+## Detection Prevalence   0.2924   0.1869   0.1764   0.1672   0.1771
+## Balanced Accuracy      1.0000   1.0000   1.0000   1.0000   1.0000</code></pre>
+<p>From the above output, this model is expected to predict with
+<code>100%</code> accuracy, and zero percent out of sample error. I
+chose to keep this <code>RandomForrest</code> model and not to try
+another model.</p>
 </div>
-<div id="use-model_rf-to-predict-on-testing-dataset.-write-out-the-predictions-for-20-test-cases." class="section level1">
-<h1>Use <code>model_rf</code> to predict on <code>testing</code>
-dataset. Write out the predictions for 20 test cases.</h1>
+<div id="re-train-the-model." class="section level1">
+<h1>Re-train the model.</h1>
+<p>Now that we have already chosen our model to be a ‘RandomForest’, it
+is a good practice to re-train the model with the whole original
+training set (without spiting to validation) before using the model to
+predict on un-seen data (in real time applications). However, with this
+remark to users, we will continue with the one we already trained.</p>
+</div>
+<div id="use-model_rf-to-predict-on-testing-data.-write-out-the-predictions-for-20-test-cases." class="section level1">
+<h1>Use <code>model_rf</code> to predict on <code>testing</code> data.
+Write out the predictions for 20 test cases.</h1>
 <pre class="r"><code>predictions_on_testing &lt;- predict(model_rf, newdata=testing)
 predictions_on_testing</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
@@ -524,9 +547,8 @@ predictions_on_testing</code></pre>
 <div id="references" class="section level1">
 <h1>References:</h1>
 <ol style="list-style-type: decimal">
-<li><p>Near-zero variance predicators. Should we remove them? <a href="https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/">R-Bloggers,
-March 16, 2014</a></p></li>
-<li><p><a href="RMarkdown%20Help">https://www.dataquest.io/blog/r-markdown-guide-cheatsheet/</a></p></li>
+<li>Near-zero variance predictors. Should we remove them? <a href="https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/">R-Bloggers,
+March 16, 2014</a></li>
 </ol>
 </div>
 
