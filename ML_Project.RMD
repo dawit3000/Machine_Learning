@@ -1,0 +1,114 @@
+--- 
+Title: "ML Project"
+author: "Dawit Aberra"
+date: August 2022
+output: html_document
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[https://www.dataquest.io/blog/r-markdown-guide-cheatsheet/](RMarkdown Help)
+
+# A Predictive Model to describe the manner in which certain weight lifting exercises are completed.
+# Synopsis
+We will use a [Weight Lifting Exercise Dataset](http://groupware.les.inf.puc-rio.br/har) in which a training and testing datasets of accelerometers on the belt, forearm, arm, and dumbell of 6 participants were provided. These participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways. 
+
+Our goal is to build a model that predicts the manner in which the participants did the exercise, with acceptable accuracy and minimal out of sample error. This is the "classe" variable in the training set which consists of six levels describing the manners. We use most of the other variables to predict with. This report describes how we built the model, how we used cross validation, what we think the expected out of sample error is, and why we made the choices we did. We will also use our prediction model to predict 20 different test cases. 
+
+# Getting and Cleaning Data
+Download Data.
+We get the training and testing data from links which are [available here](http://groupware.les.inf.puc-rio.br/har).
+
+```{r echo=T, message=F, warning=F}
+library(caret)
+training_link<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testing_link<-"https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+if (!file.exists("./data")) {dir.create("./data")}
+if (!file.exists("./data/pml-training.csv")) 
+  {download.file(training_link, destfile="./data/pml-training.csv", method="curl")}
+if (!file.exists("./data/pml-testing.csv")) 
+  {download.file(testing_link, destfile="./data/pml-testing.csv", method="curl")}
+training <-read.csv("./data/pml-training.csv")
+testing <- read.csv("./data/pml-testing.csv")
+```
+
+The `training` dataset contains `r nrow(training)` rows and `r ncol(training)` columns. The `testing` dataset contains `r nrow(testing)` rows and `r ncol(testing)` columns.
+
+```{r echo=T, message=F, warning=F}
+dim(training)
+dim(testing)
+```
+
+Remove columns with missing values or mostly not available (NA)
+```{r}
+mostlyNA <- sapply(training, function(x) mean(is.na(x))) > 0.95
+training <- training[, mostlyNA==F]
+testing <- testing[, mostlyNA==F]
+```
+
+Remove columns irrelevant to the outcome
+Inspecting the variables verses the outcome suggests that the firest 7 variables are fairly irrelevant to the expected outcome. We decided to remove these variables.
+
+```{r}
+training <- training[,-c(1:5)] 
+testing <- testing[,-c(1:5)] 
+```
+
+Remove variables with zero and near-zero variance.
+Datasets come sometimes with predictors that take a unique value across sample. Such uninformative predictor is more common. This kind of predictor is not only non-informative, it can break some models [1]. We decided to remove variables with near zero variance. 
+
+```{r}
+nzv <- nearZeroVar(training)
+training <- training[,-nzv]
+testing <- testing[,-nzv]
+```
+The cleaned `training` dataset contains `r nrow(training)` rows and `r ncol(training)` columns. The cleaned `testing` dataset contains `r nrow(testing)` rows and `r ncol(testing)` columns.
+
+```{r echo=T, message=F, warning=F}
+dim(training)
+dim(testing)
+```
+
+
+# Generate `training` and `validation` Data. 
+
+At this stage, we leave the cleaned `testing` data aside for later use only, but we split the cleaned `training` dataset to `training` and `validation` datasets to be used in the next few steps. We will keep 70% of the training dataset for training our our model and the rest for validation. 
+
+```{r}
+inTrain <- createDataPartition(y=training$classe, p=0.7, list=F)
+training <- training[inTrain, ]
+validation <- training[-inTrain, ]
+```
+
+
+
+
+# Cross-Validation
+Here we create a control to train the model using 3-Folds Cross Validation. 
+```{r}
+tc <- trainControl(method="cv", number=3, verboseIter=F)
+```
+
+# Build a RandomForest Model and view the final parameters it chose
+```{r}
+model_rf<-train(classe ~ ., data=training, method="rf", trControl=tc)
+print(model_rf$finalModel)
+```
+# Use `model_rf` to predict `classe` on the `validation` data and examine accuracy and out-of-sample errors with ConFusionMatrix
+```{r}
+predictions_on_validation<-predict(model_rf, newdata=validation)
+confusionMatrix(factor(validation$classe), predictions_on_validation)
+```
+
+
+
+
+# Use `model_rf` to predict on `testing` dataset. Write out the predictions for 20 test cases.
+```{r}
+predictions_on_testing <- predict(model_rf, newdata=testing)
+predictions_on_testing
+```
+
+# References:
+1. Near-zero variance predicators. Should we remove them? [R-Bloggers, March 16, 2014](https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/)
