@@ -11,7 +11,7 @@ output:
 
 # Synopsis
 
-We will use a [Weight Lifting Exercise Dataset](http://groupware.les.inf.puc-rio.br/har) in which `training` and `testing` datasets of accelerometers on the belt, forearm, arm, and dumbell of 6 participants were provided. These participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+We will use a [Weight Lifting Exercise Dataset](http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har) in which `training` and `testing` datasets of accelerometers on the belt, forearm, arm, and dumbell of 6 participants were provided. These participants were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
 
 Our goal is to build a model that predicts the manner in which the participants did the exercise, with acceptable accuracy and minimal out of sample error. This is the `classe` variable in the training set which consists of six levels describing the manners. We use most of the other variables to predict with. This report describes how we built the model, how we used cross validation, what we think the expected out of sample error is, and why we made the choices we did. We will also use our prediction model to predict 20 different test cases.
 
@@ -82,7 +82,7 @@ training <- training[,-c(1:5)]
 testing <- testing[,-c(1:5)] 
 ```
 
-Remove variables with zero and near-zero variance. Data come sometimes with predictors that take a unique value across sample. Such predictor is more common. This kind of predictor is not only non-informative, it can break some models [1]. We decided to remove variables with near zero variance.
+Remove variables with zero and near-zero variance. Data come sometimes with predictors that take a unique value across sample. Such predictor is more common. This kind of predictor is not only non-informative, it can break some models `[2].` We decided to remove variables with near zero variance.
 
 
 ```r
@@ -226,7 +226,7 @@ I chose to keep this `RandomForrest` model and not to try another model.
 
 Now that we have already chosen our model to be a 'RandomForest', it is a good practice to re-train the model with the whole original training set (without spiting to validation) before using the model to predict on un-seen data (in real time applications). However, with this remark to users, we will continue with the one we already trained. 
 
-# Use `model_rf` to predict on `testing` data. Write out the predictions for 20 test cases.
+# Use `model_rf` to predict on `testing` data. Write out the predictions for 20 test cases`.
 
 
 ```r
@@ -240,7 +240,7 @@ predictions_on_testing
 ```
 
 # References:
-
-1.  Near-zero variance predictors. Should we remove them? [R-Bloggers, March 16, 2014](https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/)
+1. [Weight Lifting Exercise Dataset](http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har)
+2.  Near-zero variance predictors. Should we remove them? [R-Bloggers, March 16, 2014](https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/)
 
 

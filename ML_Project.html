@@ -372,11 +372,12 @@ in which certain weight lifting exercises are completed.</h1>
 
 <div id="synopsis" class="section level1">
 <h1>Synopsis</h1>
-<p>We will use a <a href="http://groupware.les.inf.puc-rio.br/har">Weight Lifting Exercise
-Dataset</a> in which <code>training</code> and <code>testing</code>
-datasets of accelerometers on the belt, forearm, arm, and dumbell of 6
-participants were provided. These participants were asked to perform
-barbell lifts correctly and incorrectly in 5 different ways.</p>
+<p>We will use a <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har">Weight
+Lifting Exercise Dataset</a> in which <code>training</code> and
+<code>testing</code> datasets of accelerometers on the belt, forearm,
+arm, and dumbell of 6 participants were provided. These participants
+were asked to perform barbell lifts correctly and incorrectly in 5
+different ways.</p>
 <p>Our goal is to build a model that predicts the manner in which the
 participants did the exercise, with acceptable accuracy and minimal out
 of sample error. This is the <code>classe</code> variable in the
@@ -427,8 +428,8 @@ testing &lt;- testing[,-c(1:5)] </code></pre>
 <p>Remove variables with zero and near-zero variance. Data come
 sometimes with predictors that take a unique value across sample. Such
 predictor is more common. This kind of predictor is not only
-non-informative, it can break some models [1]. We decided to remove
-variables with near zero variance.</p>
+non-informative, it can break some models <code>[2].</code> We decided
+to remove variables with near zero variance.</p>
 <pre class="r"><code>nzv &lt;- nearZeroVar(training)
 training &lt;- training[,-nzv]
 testing &lt;- testing[,-nzv]</code></pre>
@@ -538,7 +539,7 @@ remark to users, we will continue with the one we already trained.</p>
 </div>
 <div id="use-model_rf-to-predict-on-testing-data.-write-out-the-predictions-for-20-test-cases." class="section level1">
 <h1>Use <code>model_rf</code> to predict on <code>testing</code> data.
-Write out the predictions for 20 test cases.</h1>
+Write out the predictions for 20 test cases`.</h1>
 <pre class="r"><code>predictions_on_testing &lt;- predict(model_rf, newdata=testing)
 predictions_on_testing</code></pre>
 <pre><code>##  [1] B A B A A E D B A A B C B A E E A B B B
@@ -547,6 +548,8 @@ predictions_on_testing</code></pre>
 <div id="references" class="section level1">
 <h1>References:</h1>
 <ol style="list-style-type: decimal">
+<li><a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har">Weight
+Lifting Exercise Dataset</a></li>
 <li>Near-zero variance predictors. Should we remove them? <a href="https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/">R-Bloggers,
 March 16, 2014</a></li>
 </ol>
