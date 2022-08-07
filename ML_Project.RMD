@@ -3,11 +3,7 @@ Title: "ML Project"
 author: "Dawit Aberra"
 date: August 2022
 output: rmarkdown::github_document
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
+---
 
 
 # A Predictive Model to describe the manner in which certain weight lifting exercises are completed.
