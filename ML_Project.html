@@ -368,7 +368,6 @@ pre code {
 <hr />
 <p>Title: “ML Project” author: “Dawit Aberra” date: August 2022 output:
 html_document</p>
-<p><a href="RMarkdown%20Help">https://www.dataquest.io/blog/r-markdown-guide-cheatsheet/</a></p>
 <div id="a-predictive-model-to-describe-the-manner-in-which-certain-weight-lifting-exercises-are-completed." class="section level1">
 <h1>A Predictive Model to describe the manner in which certain weight
 lifting exercises are completed.</h1>
@@ -467,14 +466,14 @@ print(model_rf$finalModel)</code></pre>
 ##                      Number of trees: 500
 ## No. of variables tried at each split: 27
 ## 
-##         OOB estimate of  error rate: 0.26%
+##         OOB estimate of  error rate: 0.23%
 ## Confusion matrix:
 ##      A    B    C    D    E class.error
-## A 3906    0    0    0    0 0.000000000
-## B    8 2646    3    1    0 0.004514673
+## A 3902    3    0    0    1 0.001024066
+## B    4 2650    3    1    0 0.003009782
 ## C    0    5 2391    0    0 0.002086811
-## D    0    0    8 2242    2 0.004440497
-## E    0    1    0    8 2516 0.003564356</code></pre>
+## D    0    0    9 2242    1 0.004440497
+## E    0    0    0    5 2520 0.001980198</code></pre>
 </div>
 <div id="use-model_rf-to-predict-classe-on-the-validation-data-and-examine-accuracy-and-out-of-sample-errors-with-confusionmatrix" class="section level1">
 <h1>Use <code>model_rf</code> to predict <code>classe</code> on the
@@ -486,17 +485,17 @@ confusionMatrix(factor(validation$classe), predictions_on_validation)</code></pr
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1162    0    0    0    0
-##          B    0  805    0    0    0
-##          C    0    0  715    0    0
-##          D    0    0    0  683    0
-##          E    0    0    0    0  749
+##          A 1167    0    0    0    0
+##          B    0  821    0    0    0
+##          C    0    0  704    0    0
+##          D    0    0    0  663    0
+##          E    0    0    0    0  769
 ## 
 ## Overall Statistics
 ##                                      
 ##                Accuracy : 1          
 ##                  95% CI : (0.9991, 1)
-##     No Information Rate : 0.2825     
+##     No Information Rate : 0.283      
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
 ##                                      
 ##                   Kappa : 1          
@@ -506,14 +505,14 @@ confusionMatrix(factor(validation$classe), predictions_on_validation)</code></pr
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            1.0000   1.0000   1.0000    1.000   1.0000
-## Specificity            1.0000   1.0000   1.0000    1.000   1.0000
-## Pos Pred Value         1.0000   1.0000   1.0000    1.000   1.0000
-## Neg Pred Value         1.0000   1.0000   1.0000    1.000   1.0000
-## Prevalence             0.2825   0.1957   0.1738    0.166   0.1821
-## Detection Rate         0.2825   0.1957   0.1738    0.166   0.1821
-## Detection Prevalence   0.2825   0.1957   0.1738    0.166   0.1821
-## Balanced Accuracy      1.0000   1.0000   1.0000    1.000   1.0000</code></pre>
+## Sensitivity             1.000   1.0000   1.0000   1.0000   1.0000
+## Specificity             1.000   1.0000   1.0000   1.0000   1.0000
+## Pos Pred Value          1.000   1.0000   1.0000   1.0000   1.0000
+## Neg Pred Value          1.000   1.0000   1.0000   1.0000   1.0000
+## Prevalence              0.283   0.1991   0.1707   0.1608   0.1865
+## Detection Rate          0.283   0.1991   0.1707   0.1608   0.1865
+## Detection Prevalence    0.283   0.1991   0.1707   0.1608   0.1865
+## Balanced Accuracy       1.000   1.0000   1.0000   1.0000   1.0000</code></pre>
 </div>
 <div id="use-model_rf-to-predict-on-testing-dataset.-write-out-the-predictions-for-20-test-cases." class="section level1">
 <h1>Use <code>model_rf</code> to predict on <code>testing</code>
@@ -526,8 +525,9 @@ predictions_on_testing</code></pre>
 <div id="references" class="section level1">
 <h1>References:</h1>
 <ol style="list-style-type: decimal">
-<li>Near-zero variance predicators. Should we remove them? <a href="https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/">R-Bloggers,
-March 16, 2014</a></li>
+<li><p>Near-zero variance predicators. Should we remove them? <a href="https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/">R-Bloggers,
+March 16, 2014</a></p></li>
+<li><p><a href="RMarkdown%20Help">https://www.dataquest.io/blog/r-markdown-guide-cheatsheet/</a></p></li>
 </ol>
 </div>
 

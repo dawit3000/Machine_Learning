@@ -8,7 +8,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-[https://www.dataquest.io/blog/r-markdown-guide-cheatsheet/](RMarkdown Help)
+
 
 # A Predictive Model to describe the manner in which certain weight lifting exercises are completed.
 # Synopsis
@@ -112,3 +112,5 @@ predictions_on_testing
 
 # References:
 1. Near-zero variance predicators. Should we remove them? [R-Bloggers, March 16, 2014](https://www.r-bloggers.com/2014/03/near-zero-variance-predictors-should-we-remove-them/)
+
+2. [https://www.dataquest.io/blog/r-markdown-guide-cheatsheet/](RMarkdown Help)
